@@ -1,0 +1,39 @@
+{% extends 'store/base.html' %}
+{% block title %}Profile - ShopUniq{% endblock %}
+
+{% block content %}
+<div class="cart-container">
+    <h1>👤 My Profile</h1>
+
+    <div class="profile-grid">
+        <div class="profile-card">
+            <div class="profile-avatar">{{ user.username|first|upper }}</div>
+            <h3>{{ user.username }}</h3>
+            <p>{{ user.email }}</p>
+            <p><small>Member since {{ user.date_joined|date:"M Y" }}</small></p>
+            <a href="{% url 'my_orders' %}" class="btn-primary" style="margin-top:12px; display:inline-block;">View All Orders</a>
+        </div>
+
+        <div class="recent-orders">
+            <h3>Recent Orders</h3>
+            {% if orders %}
+            <table class="order-table">
+                <thead><tr><th>ID</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td><a href="{% url 'order_detail' order.id %}">#{{ order.id }}</a></td>
+                        <td>{{ order.created_at|date:"d M Y" }}</td>
+                        <td>₹{{ order.total }}</td>
+                        <td><span class="status-badge {{ order.status }}">{{ order.get_status_display }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p>No orders yet. <a href="{% url 'product_list' %}">Start shopping!</a></p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

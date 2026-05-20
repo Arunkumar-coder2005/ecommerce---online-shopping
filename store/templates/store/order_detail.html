@@ -1,0 +1,52 @@
+{% extends 'store/base.html' %}
+{% block title %}Order #{{ order.id }} - ShopUniq{% endblock %}
+
+{% block content %}
+<div class="order-detail-container">
+    <h1>Order Confirmation ✅</h1>
+    <p class="thank-you">Thank you, {{ order.full_name }}! Your order has been placed.</p>
+
+    <div class="order-info-grid">
+        <div class="order-info-box">
+            <h3>Order Details</h3>
+            <p><strong>Order ID:</strong> #{{ order.id }}</p>
+            <p><strong>Date:</strong> {{ order.created_at|date:"d M Y, h:i A" }}</p>
+            <p><strong>Status:</strong> <span class="status-badge {{ order.status }}">{{ order.get_status_display }}</span></p>
+            <p><strong>Payment:</strong> {{ order.payment_method }}</p>
+        </div>
+
+        <div class="order-info-box">
+            <h3>Delivery Address</h3>
+            <p>{{ order.full_name }}</p>
+            <p>{{ order.address }}</p>
+            <p>{{ order.city }}, {{ order.state }} - {{ order.pincode }}</p>
+            <p>📞 {{ order.phone }}</p>
+        </div>
+    </div>
+
+    <h3 style="margin-top:24px;">Items Ordered</h3>
+    <table class="order-table">
+        <thead>
+            <tr><th>Product</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ item.price }}</td>
+                <td>₹{{ item.subtotal }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr><td colspan="3"><strong>Total</strong></td><td><strong>₹{{ order.total }}</strong></td></tr>
+        </tfoot>
+    </table>
+
+    <div style="margin-top:24px; display:flex; gap:12px;">
+        <a href="{% url 'my_orders' %}" class="btn-primary">My Orders</a>
+        <a href="{% url 'product_list' %}" class="btn-outline">Continue Shopping</a>
+    </div>
+</div>
+{% endblock %}

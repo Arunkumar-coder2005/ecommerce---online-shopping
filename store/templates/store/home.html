@@ -1,0 +1,89 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}ShopUniq - Home{% endblock %}
+
+{% block content %}
+
+<!-- HERO BANNER -->
+<section class="hero">
+    <div class="hero-text">
+        <h1>Big Deals. Every Day.</h1>
+        <p>Discover thousands of products at unbeatable prices. Fast delivery across India.</p>
+        <a href="{% url 'product_list' %}" class="btn-primary">Shop Now →</a>
+    </div>
+    <div class="hero-badge">
+        <span class="hero-percent">80%</span>
+        <span>OFF</span>
+        <small>Limited Time</small>
+    </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section">
+    <h2 class="section-title">Shop by Category</h2>
+    <div class="categories-grid">
+        {% for cat in categories %}
+        <a href="{% url 'product_list' %}?category={{ cat.slug }}" class="cat-card">
+            {% if cat.image %}
+                <img src="{{ cat.image.url }}" alt="{{ cat.name }}">
+            {% else %}
+                <div class="cat-placeholder">🏷️</div>
+            {% endif %}
+            <span>{{ cat.name }}</span>
+        </a>
+        {% empty %}
+            <p>No categories yet. Add from Admin panel.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- FEATURED PRODUCTS -->
+<section class="section">
+    <h2 class="section-title">Featured Products</h2>
+    <div class="products-grid">
+        {% for product in featured_products %}
+        <div class="product-card">
+            {% if product.discount_percent %}
+                <span class="discount-badge">-{{ product.discount_percent }}%</span>
+            {% endif %}
+            <a href="{% url 'product_detail' product.slug %}">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                    <div class="product-img-placeholder">📦</div>
+                {% endif %}
+                <div class="product-info">
+                    <p class="product-name">{{ product.name }}</p>
+                    <div class="product-price">
+                        <span class="price">₹{{ product.price }}</span>
+                        {% if product.old_price %}
+                            <span class="old-price">₹{{ product.old_price }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'add_to_cart' product.id %}" class="add-cart-btn">Add to Cart</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="add-cart-btn">Login to Buy</a>
+            {% endif %}
+        </div>
+        {% empty %}
+            <p>No products yet. Add from Admin panel.</p>
+        {% endfor %}
+    </div>
+    <div style="text-align:center; margin-top:30px;">
+        <a href="{% url 'product_list' %}" class="btn-primary">View All Products →</a>
+    </div>
+</section>
+
+<!-- WHY US -->
+<section class="features-section">
+    <div class="feature">🚚 <strong>Free Delivery</strong><br><small>On orders above ₹499</small></div>
+    <div class="feature">🔒 <strong>Secure Payment</strong><br><small>100% safe transactions</small></div>
+    <div class="feature">↩️ <strong>Easy Returns</strong><br><small>7-day return policy</small></div>
+    <div class="feature">🎧 <strong>24/7 Support</strong><br><small>Always here to help</small></div>
+</section>
+
+{% endblock %}

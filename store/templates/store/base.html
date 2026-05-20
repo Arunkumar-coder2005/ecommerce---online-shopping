@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ShopUniq{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'store/css/style.css' %}">
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="{% url 'home' %}" class="logo">🛒 ShopUniq</a>
+
+        <form class="search-form" method="GET" action="{% url 'product_list' %}">
+            <input type="text" name="q" placeholder="Search products..." value="{{ request.GET.q }}">
+            <button type="submit">Search</button>
+        </form>
+
+        <div class="nav-links">
+            {% if user.is_authenticated %}
+                <a href="{% url 'cart' %}" class="nav-btn">🛒 Cart
+                    {% if cart_count > 0 %}<span class="badge">{{ cart_count }}</span>{% endif %}
+                </a>
+                <a href="{% url 'profile' %}" class="nav-btn">👤 {{ user.username }}</a>
+                <a href="{% url 'logout' %}" class="nav-btn logout-btn">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="nav-btn">Login</a>
+                <a href="{% url 'register' %}" class="nav-btn register-btn">Register</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Category Bar -->
+    <div class="category-bar">
+        <a href="{% url 'product_list' %}">All Products</a>
+        {% for cat in categories %}
+            <a href="{% url 'product_list' %}?category={{ cat.slug }}">{{ cat.name }}</a>
+        {% endfor %}
+    </div>
+</nav>
+
+<!-- ── MESSAGES ── -->
+{% if messages %}
+<div class="messages-container">
+    {% for msg in messages %}
+        <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- ── CONTENT ── -->
+<main class="main-content">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-col">
+            <h4>🛒 ShopUniq</h4>
+            <p>Your one-stop online shopping destination. Best prices, fast delivery.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Quick Links</h4>
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'product_list' %}">Products</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'my_orders' %}">My Orders</a>
+                <a href="{% url 'profile' %}">Profile</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}">Register</a>
+            {% endif %}
+        </div>
+        <div class="footer-col">
+            <h4>Contact</h4>
+            <p>📧 support@shopuniq.com</p>
+            <p>📞 1800-123-4567</p>
+            <p>📍 Chennai, Tamil Nadu</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 ShopUniq. Built with Python Django + MySQL. All rights reserved.</p>
+    </div>
+</footer>
+
+<script src="{% static 'store/js/main.js' %}"></script>
+</body>
+</html>

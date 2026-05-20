@@ -1,0 +1,80 @@
+{% extends 'store/base.html' %}
+{% block title %}Products - ShopUniq{% endblock %}
+
+{% block content %}
+<div class="page-layout">
+
+    <!-- SIDEBAR FILTERS -->
+    <aside class="sidebar">
+        <h3>Categories</h3>
+        <ul class="filter-list">
+            <li><a href="{% url 'product_list' %}" {% if not selected_category %}class="active"{% endif %}>All Products</a></li>
+            {% for cat in categories %}
+            <li>
+                <a href="?category={{ cat.slug }}"
+                   {% if selected_category == cat.slug %}class="active"{% endif %}>
+                    {{ cat.name }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <h3 style="margin-top:24px;">Sort By</h3>
+        <ul class="filter-list">
+            <li><a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=new">Newest First</a></li>
+            <li><a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=low">Price: Low to High</a></li>
+            <li><a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}sort=high">Price: High to Low</a></li>
+        </ul>
+    </aside>
+
+    <!-- PRODUCT GRID -->
+    <div class="products-main">
+        {% if search_query %}
+            <p class="search-result-text">Results for: <strong>"{{ search_query }}"</strong> — {{ products.count }} found</p>
+        {% endif %}
+
+        <div class="products-grid">
+            {% for product in products %}
+            <div class="product-card">
+                {% if product.discount_percent %}
+                    <span class="discount-badge">-{{ product.discount_percent }}%</span>
+                {% endif %}
+                <a href="{% url 'product_detail' product.slug %}">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                    {% else %}
+                        <div class="product-img-placeholder">📦</div>
+                    {% endif %}
+                    <div class="product-info">
+                        <p class="product-name">{{ product.name }}</p>
+                        <div class="product-price">
+                            <span class="price">₹{{ product.price }}</span>
+                            {% if product.old_price %}
+                                <span class="old-price">₹{{ product.old_price }}</span>
+                            {% endif %}
+                        </div>
+                        <small class="stock-info">
+                            {% if product.stock > 0 %}✅ In Stock{% else %}❌ Out of Stock{% endif %}
+                        </small>
+                    </div>
+                </a>
+                {% if product.stock > 0 %}
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'add_to_cart' product.id %}" class="add-cart-btn">Add to Cart</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="add-cart-btn">Login to Buy</a>
+                    {% endif %}
+                {% else %}
+                    <button class="add-cart-btn disabled" disabled>Out of Stock</button>
+                {% endif %}
+            </div>
+            {% empty %}
+                <div class="empty-state">
+                    <p>🔍 No products found.</p>
+                    <a href="{% url 'product_list' %}" class="btn-primary">View All</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

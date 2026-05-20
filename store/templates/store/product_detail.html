@@ -1,0 +1,121 @@
+{% extends 'store/base.html' %}
+{% block title %}{{ product.name }} - ShopUniq{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+
+    <!-- PRODUCT TOP SECTION -->
+    <div class="product-detail-top">
+        <div class="product-detail-img">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+                <div class="product-img-placeholder large">📦</div>
+            {% endif %}
+        </div>
+
+        <div class="product-detail-info">
+            <p class="product-category">{{ product.category.name }}</p>
+            <h1>{{ product.name }}</h1>
+
+            <div class="product-price-detail">
+                <span class="price-big">₹{{ product.price }}</span>
+                {% if product.old_price %}
+                    <span class="old-price">₹{{ product.old_price }}</span>
+                    <span class="discount-text">{{ product.discount_percent }}% OFF</span>
+                {% endif %}
+            </div>
+
+            <p class="product-description">{{ product.description }}</p>
+
+            <p class="stock-info">
+                {% if product.stock > 0 %}
+                    ✅ In Stock ({{ product.stock }} available)
+                {% else %}
+                    ❌ Out of Stock
+                {% endif %}
+            </p>
+
+            {% if product.stock > 0 %}
+                {% if user.is_authenticated %}
+                    <a href="{% url 'add_to_cart' product.id %}" class="btn-primary btn-large">🛒 Add to Cart</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn-primary btn-large">Login to Buy</a>
+                {% endif %}
+            {% else %}
+                <button class="btn-primary btn-large disabled" disabled>Out of Stock</button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- REVIEWS -->
+    <div class="reviews-section">
+        <h2>Customer Reviews ({{ reviews.count }})</h2>
+
+        {% if user.is_authenticated %}
+        <div class="review-form">
+            <h3>Write a Review</h3>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Rating:</label>
+                    <select name="rating" required>
+                        <option value="">Select Rating</option>
+                        <option value="5">⭐⭐⭐⭐⭐ (5 - Excellent)</option>
+                        <option value="4">⭐⭐⭐⭐ (4 - Good)</option>
+                        <option value="3">⭐⭐⭐ (3 - Average)</option>
+                        <option value="2">⭐⭐ (2 - Poor)</option>
+                        <option value="1">⭐ (1 - Very Poor)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Comment:</label>
+                    <textarea name="comment" rows="3" placeholder="Write your review..." required></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Submit Review</button>
+            </form>
+        </div>
+        {% endif %}
+
+        <div class="reviews-list">
+            {% for review in reviews %}
+            <div class="review-card">
+                <div class="review-header">
+                    <strong>{{ review.user.username }}</strong>
+                    <span class="stars">{% for i in "12345" %}{% if forloop.counter <= review.rating %}⭐{% endif %}{% endfor %}</span>
+                    <small>{{ review.created_at|date:"d M Y" }}</small>
+                </div>
+                <p>{{ review.comment }}</p>
+            </div>
+            {% empty %}
+                <p>No reviews yet. Be the first to review!</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- RELATED PRODUCTS -->
+    {% if related %}
+    <div class="related-section">
+        <h2>Related Products</h2>
+        <div class="products-grid">
+            {% for p in related %}
+            <div class="product-card">
+                <a href="{% url 'product_detail' p.slug %}">
+                    {% if p.image %}
+                        <img src="{{ p.image.url }}" alt="{{ p.name }}">
+                    {% else %}
+                        <div class="product-img-placeholder">📦</div>
+                    {% endif %}
+                    <div class="product-info">
+                        <p class="product-name">{{ p.name }}</p>
+                        <span class="price">₹{{ p.price }}</span>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
