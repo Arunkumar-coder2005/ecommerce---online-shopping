@@ -1,0 +1,1 @@
+web: gunicorn shopuniq.wsgi --log-file -
